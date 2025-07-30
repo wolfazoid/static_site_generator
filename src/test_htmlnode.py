@@ -1,6 +1,6 @@
 import unittest
 
-from htmlnode import HTMLNode
+from htmlnode import HTMLNode, LeafNode
 
 
 class TestHTMLNode(unittest.TestCase):
@@ -63,6 +63,37 @@ class TestHTMLNode(unittest.TestCase):
         with self.assertRaises(NotImplementedError):
             node.to_html()
 
+class TestLeafNode(unittest.TestCase):
+    def test_leaf_to_html_p(self):
+        node = LeafNode("p", "Hello, world!")
+        self.assertEqual(node.to_html(), "<p>Hello, world!</p>")
+
+    def test_leaf_to_html_a(self):
+        node = LeafNode("a", "Visit my website", 
+                        props={"href": "https://github.com/wolfazoid", "target": "_blank"})
+        self.assertEqual(node.to_html(), '<a href="https://github.com/wolfazoid" target="_blank">Visit my website</a>')
+
+    def test_values(self):
+        node = LeafNode(
+            "div",
+            "I wish I could read",
+        )
+        self.assertEqual(
+            node.tag,
+            "div",
+        )
+        self.assertEqual(
+            node.value,
+            "I wish I could read",
+        )
+        self.assertEqual(
+            node.props,
+            None,
+        )
+
+    def test_value_required(self):
+        with self.assertRaises(TypeError):
+            node = LeafNode('p')
 
 if __name__ == "__main__":
     unittest.main()
