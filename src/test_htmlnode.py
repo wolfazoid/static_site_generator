@@ -1,6 +1,6 @@
 import unittest
 
-from htmlnode import HTMLNode, LeafNode
+from htmlnode import HTMLNode, LeafNode, ParentNode
 
 
 class TestHTMLNode(unittest.TestCase):
@@ -79,6 +79,73 @@ class TestHTMLNode(unittest.TestCase):
     def test_leaf_to_html_no_tag(self):
         node = LeafNode(None, "Hello, world!")
         self.assertEqual(node.to_html(), "Hello, world!")
+
+    def test_to_html_with_children(self):
+        child_node = LeafNode("span", "child")
+        parent_node = ParentNode("div", [child_node])
+        self.assertEqual(parent_node.to_html(), "<div><span>child</span></div>")
+
+    def test_to_html_with_grandchildren(self):
+        grandchild_node = LeafNode("b", "grandchild")
+        child_node = ParentNode("span", [grandchild_node])
+        parent_node = ParentNode("div", [child_node])
+        self.assertEqual(
+            parent_node.to_html(),
+            "<div><span><b>grandchild</b></span></div>",
+        )
+
+    def test_to_html_with_multiple_children(self):
+        grandchild_node1 = LeafNode("b", "grandchild1")
+        child_node1 = ParentNode("span", [grandchild_node1])
+        grandchild_node2 = LeafNode("i", "grandchild2")
+        child_node2 = ParentNode("a", [grandchild_node2])
+        parent_node = ParentNode("div", [child_node1, child_node2])
+        self.assertEqual(
+            parent_node.to_html(),
+            "<div><span><b>grandchild1</b></span><a><i>grandchild2</i></a></div>",
+        )
+    
+    def test_to_html_with_children_props(self):
+        child_node = LeafNode("a", "child link", props={"href": "https://github.com/wolfazoid", "target": "_blank"})
+        parent_node = ParentNode("div", [child_node])
+        self.assertEqual(parent_node.to_html(), '<div><a href="https://github.com/wolfazoid" target="_blank">child link</a></div>')
+
+    def test_to_html_with_grandchildren_props(self):
+        grandchild_node = LeafNode("a", "grandchild link", props={"href": "https://github.com/wolfazoid", "target": "_blank"})
+        child_node = ParentNode("span", [grandchild_node])
+        parent_node = ParentNode("div", [child_node])
+        self.assertEqual(
+            parent_node.to_html(),
+            '<div><span><a href="https://github.com/wolfazoid" target="_blank">grandchild link</a></span></div>',
+        )
+
+    def test_to_html_with_leafs(self):
+        node = ParentNode(
+            "p",
+            [
+                LeafNode("b", "Bold text"),
+                LeafNode(None, "Normal text"),
+                LeafNode("i", "italic text"),
+                LeafNode(None, "Normal text"),
+            ],
+        )
+
+        self.assertEqual(
+            node.to_html(),
+            "<p><b>Bold text</b>Normal text<i>italic text</i>Normal text</p>",
+        )
+
+    def test_parent_no_child_error(self):
+        node = ParentNode("b", None)
+        with self.assertRaises(ValueError):
+            node.to_html()
+
+    def test_parent_no_tag_error(self):
+        child_node = LeafNode("span", "child")
+        node = ParentNode(None, [child_node])
+        with self.assertRaises(ValueError):
+            node.to_html()
+
 
 if __name__ == "__main__":
     unittest.main()
