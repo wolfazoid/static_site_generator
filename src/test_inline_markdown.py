@@ -1,6 +1,6 @@
 import unittest
 
-from splitnodes import split_nodes_delimiter
+from inline_markdown import split_nodes_delimiter, extract_markdown_images, extract_markdown_links
 from textnode import TextType, TextNode
 
 
@@ -63,4 +63,33 @@ class TestSplitNodesDelimiter(unittest.TestCase):
             TextNode("messed", TextType.BOLD),
             TextNode("up", TextType.TEXT),
         ])
+
+    def test_extract_markdown_images(self):
+        matches = extract_markdown_images(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png)"
+        )
+        self.assertListEqual([("image", "https://i.imgur.com/zjjcJKZ.png")], matches)
+
+    def test_extract_markdown_links(self):
+        matches = extract_markdown_links(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and a [link](https://www.boot.dev/lessons/ab12db79-fc4e-46f1-81d2-4694e7f3b8f6)"
+        )
+        self.assertListEqual([("link", "https://www.boot.dev/lessons/ab12db79-fc4e-46f1-81d2-4694e7f3b8f6")], matches)
     
+    def test_boots(self):
+        matches = extract_markdown_links(
+            "[this link](https://example.com) and [another](https://test.com)"
+        )
+        self.assertListEqual([("this link", "https://example.com"), ("another", "https://test.com")], matches)
+
+    def test_extraction_without_url(self):
+        matches = extract_markdown_links(
+            "This is text with an ![image](https://i.imgur.com/zjjcJKZ.png) and a [link]"
+        )
+        self.assertListEqual([], matches)
+
+    def test_image_without_alt(self):
+        matches = extract_markdown_images(
+            "This is text with an ![](https://i.imgur.com/zjjcJKZ.png) and a [link]"
+        )
+        self.assertListEqual([("","https://i.imgur.com/zjjcJKZ.png")], matches)
