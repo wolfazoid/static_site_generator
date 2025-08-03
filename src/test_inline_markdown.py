@@ -130,13 +130,21 @@ class TestSplitNodesDelimiter(unittest.TestCase):
             new_nodes,
         )
     
-    
     def test_multiple_consecutive_images(self):
         node = TextNode(
             "![first](https://example.com/1.png)![second](https://example.com/2.png)",
             TextType.TEXT,
         )
         new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+            [
+                TextNode("first", TextType.IMAGE, "https://example.com/1.png"),
+                TextNode(
+                    "second", TextType.IMAGE, "https://example.com/2.png"
+                ),
+            ],
+            new_nodes,
+        )
 
     
     def test_image_at_beginning(self):
@@ -145,6 +153,15 @@ class TestSplitNodesDelimiter(unittest.TestCase):
             TextType.TEXT,
         )
         new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+            [
+                TextNode("image", TextType.IMAGE, "https://example.com/pic.png"),
+                TextNode(
+                    " some text after", TextType.TEXT,
+                ),
+            ],
+            new_nodes,
+        )
 
 
     def test_exclamation_in_text(self):
@@ -153,3 +170,45 @@ class TestSplitNodesDelimiter(unittest.TestCase):
             TextType.TEXT,
         )
         new_nodes = split_nodes_image([node])
+        self.assertListEqual(
+            [
+                TextNode(
+                    "Wow! This is exciting! ", TextType.TEXT,
+                ),
+                TextNode("image", TextType.IMAGE, "https://example.com/pic.png"),
+                TextNode(" Amazing!", TextType.TEXT),
+            ],
+            new_nodes,
+        )
+
+    def test_link_at_beginning(self):
+        node = TextNode(
+            "[link](https://example.com/pic.png) some text after",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+        self.assertListEqual(
+            [
+                TextNode("link", TextType.LINK, "https://example.com/pic.png"),
+                TextNode(
+                    " some text after", TextType.TEXT,
+                ),
+            ],
+            new_nodes,
+        )
+
+    def test_multiple_consecutive_links(self):
+        node = TextNode(
+            "[first](https://example.com/1.png)[second](https://example.com/2.png)",
+            TextType.TEXT,
+        )
+        new_nodes = split_nodes_link([node])
+        self.assertListEqual(
+            [
+                TextNode("first", TextType.LINK, "https://example.com/1.png"),
+                TextNode(
+                    "second", TextType.LINK, "https://example.com/2.png"
+                ),
+            ],
+            new_nodes,
+        )
