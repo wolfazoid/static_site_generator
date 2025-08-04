@@ -174,5 +174,29 @@ This is more code
             BlockType.PARAGRAPH,
         )
 
+    def test_block_to_heading(self):
+        block = """# This is a heading"""
+        block_type = block_to_block_type(block)
+        self.assertEqual(
+            block_type,
+            BlockType.HEADING,
+        )
+
+    def test_block_to_h2(self):
+        block = """## This is an h2"""
+        block_type = block_to_block_type(block)
+        self.assertEqual(
+            block_type,
+            BlockType.HEADING,
+        )
+
+    def test_block_to_h7(self):
+        block = """####### This is not an accepted heading"""
+        block_type = block_to_block_type(block)
+        self.assertEqual(
+            block_type,
+            BlockType.PARAGRAPH,
+        )
+
 if __name__ == "__main__":
     unittest.main()
