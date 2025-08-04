@@ -4,9 +4,8 @@ from block_markdown import (
     markdown_to_blocks, 
     block_to_block_type, 
     BlockType, 
-    heading_block_to_html,
+    heading_to_html,
     markdown_to_html_node,
-
     )
 
 class TestBlockMarkdown(unittest.TestCase):
@@ -207,45 +206,37 @@ This is more code
 
     def test_heading_to_h1(self):
         block = """# This is an h1"""
-        htag = heading_block_to_html(block)
+        html = heading_to_html(block)
         self.assertEqual(
-            htag,
+            html.tag,
             'h1',
         )
     
     def test_heading_to_h2(self):
-        block = """## This is an h1"""
-        htag = heading_block_to_html(block)
+        block = """## This is an h2"""
+        html = heading_to_html(block)
         self.assertEqual(
-            htag,
+            html.tag,
             'h2',
         )
     
     def test_heading_to_h6(self):
-        block = """###### This is an h1"""
-        htag = heading_block_to_html(block)
+        block = """###### This is an h6"""
+        html = heading_to_html(block)
         self.assertEqual(
-            htag,
-            'h6',
-        )
-    
-    def test_heading_to_h6(self):
-        block = """###### This is an h1"""
-        htag = heading_block_to_html(block)
-        self.assertEqual(
-            htag,
+            html.tag,
             'h6',
         )
     
     def test_h7_value_error(self):
         block = """####### This is an h1"""
         with self.assertRaises(ValueError):
-            htag = heading_block_to_html(block)
+            html = heading_to_html(block)
     
     def test_no_heading_value_error(self):
         block = """This is not an h1"""
         with self.assertRaises(ValueError):
-            htag = heading_block_to_html(block)
+            htag = heading_to_html(block)
     
     def test_markdown_to_html_node(self):
         markdown = """
@@ -253,10 +244,17 @@ This is a simple paragraph with **bold** and _italic_ text.
 
 This is a second paragraph to demonstrate line breaks.
 
-- This is an unordered list and should break things
+- This is an unordered list and should **break things**
+- This is a another list item
+
+Give me more space.
+
+> Words can be like X-rays, if you use them properly—they’ll go through anything. You read and you’re pierced.
+> Aldous Huxley, Brave New World
 """
         html_node = markdown_to_html_node(markdown)
-        print(f'\n\nHTML Unit Test. html_node value:\n\n{html_node}\n')
+        print(f'\n\nHTML Unit Test. \n\nhtml_node value:\n\n{html_node}\n')
+        print(f'\nto_html value:\n\n{html_node.to_html()}\n')
 
 if __name__ == "__main__":
     unittest.main()

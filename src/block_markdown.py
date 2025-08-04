@@ -15,29 +15,26 @@ class BlockType(Enum):
 def markdown_to_html_node(markdown):
     blocks_list = markdown_to_blocks(markdown)
     parent_node = ParentNode('div', children=None, props=None)
-    all_html_nodes = []
+    html_nodes = []
     for block in blocks_list:
         block_type = block_to_block_type(block)
         block_text = text_to_textnodes(block)
         if block_type == BlockType.PARAGRAPH:
-            children = text_to_children(block)
-            html_node = HTMLNode('p',children=children)
-            all_html_nodes.append(html_node)
+            html_nodes.append(paragraph_to_html(block))
         if block_type == BlockType.HEADING:
-            htag, hbody = heading_block_to_html(block)
-            html_node = HTMLNode(tag={htag}, value={hbody})
+            html_nodes.append(heading_to_html(block))
         if block_type == BlockType.QUOTE:
-            html_node = HTMLNode(tag='blockquote')
+            html_nodes.append(quote_to_html(block))
         if block_type == BlockType.CODE:
             pass
         if block_type == BlockType.UNORDERED_LIST:
-            children = text_to_children(block)
-            html_node = HTMLNode(tag='ul', children=children)
-            all_html_nodes.append(html_node)
+            html_node = unordered_list_to_html(block)
+            # html_node = ParentNode(tag='ul', children=children)
+            html_nodes.append(html_node)
         if block_type == BlockType.ORDERED_LIST:
-            html_node = HTMLNode(tag='ol')
+            html_node = ParentNode(tag='ol')
         #based on block_type, create an HTMLNode with tag, children, props
-    parent_node.children = all_html_nodes
+    parent_node.children = html_nodes
     return parent_node
 
 def text_to_children(text):
@@ -48,36 +45,55 @@ def text_to_children(text):
         children.append(html_node)
     return children
 
+def paragraph_to_html(block):
+    children = text_to_children(block)
+    html_node = ParentNode('p',children=children)
+    return html_node
 
-def heading_block_to_html(block):
+def heading_to_html(block):
     heading_count = block.split()[0].count('#')
     if heading_count > 6:
         raise ValueError("Invalid heading, only headings up to h6 are accepted")
     if heading_count == 0:
         raise ValueError("Heading block passed but not heading delimiters found")
     heading_tag = f'h{heading_count}'
-    # heading_body = block.split(' ',1)[1]
-    return heading_tag #, heading_body
+    heading_body = block.split(' ',1)[1]
+    children = text_to_children(heading_body)
+    html_node = ParentNode(heading_tag,children=children)
+    return html_node
 
+def unordered_list_to_html(block):
+    lines = block.split('\n')
+    line_items = []
+    for line in lines:
+        cleaned_line = line.strip('- ')
+        line_children = text_to_children(cleaned_line)
+        line_item_html = ParentNode('li', children=line_children)
+        line_items.append(line_item_html)
+    ul_node = ParentNode('ul', children=line_items)
+    return ul_node
 
-def block_type_to_tag(block_type):
-    # Set tag based on block type
-    pass
+def quote_to_html(block):
+    lines = block.split('\n')
+    line_items = []
+    for line in lines:
+        cleaned_line = line.strip('> ')
+        line_children = text_to_children(cleaned_line)
+        line_item_html = ParentNode('p', children=line_children)
+        line_items.append(line_item_html)
+    quote_node = ParentNode('blockquote', children=line_items)
+    return quote_node
 
-def link_to_props(block):
-    # Convert link to props dictionary
-    # Return HTMLNode with props and tag
-    pass
+def markdown_to_blocks(markdown):
+    blocks = markdown.split('\n\n')
+    blocks_list = []
+    for block in blocks:
+        if block == "":
+            continue
+        block = block.strip()
+        blocks_list.append(block)
 
-def image_to_props(block):
-    # convert image to props dictionary
-    # Return HTMLNode with props and tag
-    pass
-
-def block_to_html_node(block, block_type):
-    # Identify block type
-    # send appropriate tag to HTML Node based on block type
-    pass
+    return blocks_list
 
 def block_to_block_type(block):
     block = block.strip()
@@ -105,13 +121,26 @@ def block_to_block_type(block):
         return BlockType.ORDERED_LIST
     return BlockType.PARAGRAPH
 
-def markdown_to_blocks(markdown):
-    blocks = markdown.split('\n\n')
-    blocks_list = []
-    for block in blocks:
-        if block == "":
-            continue
-        block = block.strip()
-        blocks_list.append(block)
 
-    return blocks_list
+## Functions I might use
+
+
+def block_type_to_tag(block_type):
+    # Set tag based on block type
+    pass
+
+def link_to_props(block):
+    # Convert link to props dictionary
+    # Return HTMLNode with props and tag
+    pass
+
+def image_to_props(block):
+    # convert image to props dictionary
+    # Return HTMLNode with props and tag
+    pass
+
+def block_to_html_node(block, block_type):
+    # Identify block type
+    # send appropriate tag to HTML Node based on block type
+    pass
+
