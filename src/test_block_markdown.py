@@ -1,6 +1,6 @@
 import unittest
 
-from block_markdown import markdown_to_blocks
+from block_markdown import markdown_to_blocks, block_to_block_type, BlockType
 
 class TestBlockMarkdown(unittest.TestCase):
     def test_markdown_to_blocks(self):
@@ -92,6 +92,87 @@ This is the same paragraph on a new line
             ],
         )
 
+
+    def test_block_to_paragraph(self):
+        block = """
+This is **bolded** paragraph
+"""
+        block_type = block_to_block_type(block)
+        self.assertEqual(
+            block_type,
+            BlockType.PARAGRAPH,
+        )
+
+    def test_block_to_quote(self):
+        block = """> This is **bolded** quote
+> This is more quote text 
+"""
+        block_type = block_to_block_type(block)
+        self.assertEqual(
+            block_type,
+            BlockType.QUOTE,
+        )
+
+    def test_block_to_code(self):
+        block = """
+```> This is **bolded** code
+> This is more code 
+and a random line to test
+```
+"""
+        block_type = block_to_block_type(block)
+        self.assertEqual(
+            block_type,
+            BlockType.CODE,
+        )
+
+    def test_block_to_ul(self):
+        block = """
+- ```> This is **bolded** code
+- > This is more code 
+- and a random line to test
+"""
+        block_type = block_to_block_type(block)
+        self.assertEqual(
+            block_type,
+            BlockType.UNORDERED_LIST,
+        )
+
+    def test_block_to_ol(self):
+        block = """
+1. > This is **bolded** code
+2. > This is more code 
+3. and a random line to test
+"""
+        block_type = block_to_block_type(block)
+        self.assertEqual(
+            block_type,
+            BlockType.ORDERED_LIST,
+        )
+
+    def test_block_bad_ol(self):
+        block = """
+1. > This is **bolded** code
+2. > This is more code 
+5. and a random line to test
+"""
+        block_type = block_to_block_type(block)
+        self.assertEqual(
+            block_type,
+            BlockType.PARAGRAPH,
+        )
+
+    def test_block_bad_ul(self):
+        block = """
+- This is **bolded** code
+This is more code 
+- and a random line to test
+"""
+        block_type = block_to_block_type(block)
+        self.assertEqual(
+            block_type,
+            BlockType.PARAGRAPH,
+        )
 
 if __name__ == "__main__":
     unittest.main()
