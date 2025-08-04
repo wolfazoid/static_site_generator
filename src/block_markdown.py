@@ -1,5 +1,5 @@
 from enum import Enum
-from htmlnode import HTMLNode, LeafNode, ParentNode
+from htmlnode import ParentNode
 from textnode import TextNode, TextType, text_node_to_html_node
 from inline_markdown import text_to_textnodes
 
@@ -18,7 +18,6 @@ def markdown_to_html_node(markdown):
     html_nodes = []
     for block in blocks_list:
         block_type = block_to_block_type(block)
-        block_text = text_to_textnodes(block)
         if block_type == BlockType.PARAGRAPH:
             html_nodes.append(paragraph_to_html(block))
         if block_type == BlockType.HEADING:
@@ -35,10 +34,12 @@ def markdown_to_html_node(markdown):
     return parent_node
 
 def code_to_html(block):
-    text = block.strip("'''")
-    code_text = TextNode(text, TextType.CODE)
-    code_html = text_node_to_html_node(code_text)
-    html_node = ParentNode('pre', children=code_html)
+    children = []
+    text = block[3:-3].lstrip()
+    text_node = TextNode(text=text,text_type=TextType.CODE)
+    code_html = text_node_to_html_node(text_node)
+    children.append(code_html)
+    html_node = ParentNode('pre', children=children)
     return html_node
 
 def text_to_children(text):
@@ -50,7 +51,8 @@ def text_to_children(text):
     return children
 
 def paragraph_to_html(block):
-    children = text_to_children(block)
+    normalized_text = " ".join(block.split())
+    children = text_to_children(normalized_text)
     html_node = ParentNode('p',children=children)
     return html_node
 
@@ -109,11 +111,9 @@ def markdown_to_blocks(markdown):
             continue
         block = block.strip()
         blocks_list.append(block)
-
     return blocks_list
 
 def block_to_block_type(block):
-    block = block.strip()
     lines = block.split('\n')
     if block.startswith(('# ', '## ', '### ', '#### ', '##### ', '###### ')):
         return BlockType.HEADING
