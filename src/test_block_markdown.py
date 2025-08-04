@@ -1,6 +1,13 @@
 import unittest
 
-from block_markdown import markdown_to_blocks, block_to_block_type, BlockType
+from block_markdown import (
+    markdown_to_blocks, 
+    block_to_block_type, 
+    BlockType, 
+    heading_block_to_html,
+    markdown_to_html_node,
+
+    )
 
 class TestBlockMarkdown(unittest.TestCase):
     def test_markdown_to_blocks(self):
@@ -197,6 +204,59 @@ This is more code
             block_type,
             BlockType.PARAGRAPH,
         )
+
+    def test_heading_to_h1(self):
+        block = """# This is an h1"""
+        htag = heading_block_to_html(block)
+        self.assertEqual(
+            htag,
+            'h1',
+        )
+    
+    def test_heading_to_h2(self):
+        block = """## This is an h1"""
+        htag = heading_block_to_html(block)
+        self.assertEqual(
+            htag,
+            'h2',
+        )
+    
+    def test_heading_to_h6(self):
+        block = """###### This is an h1"""
+        htag = heading_block_to_html(block)
+        self.assertEqual(
+            htag,
+            'h6',
+        )
+    
+    def test_heading_to_h6(self):
+        block = """###### This is an h1"""
+        htag = heading_block_to_html(block)
+        self.assertEqual(
+            htag,
+            'h6',
+        )
+    
+    def test_h7_value_error(self):
+        block = """####### This is an h1"""
+        with self.assertRaises(ValueError):
+            htag = heading_block_to_html(block)
+    
+    def test_no_heading_value_error(self):
+        block = """This is not an h1"""
+        with self.assertRaises(ValueError):
+            htag = heading_block_to_html(block)
+    
+    def test_markdown_to_html_node(self):
+        markdown = """
+This is a simple paragraph with **bold** and _italic_ text.
+
+This is a second paragraph to demonstrate line breaks.
+
+- This is an unordered list and should break things
+"""
+        html_node = markdown_to_html_node(markdown)
+        print(f'\n\nHTML Unit Test. html_node value:\n\n{html_node}\n')
 
 if __name__ == "__main__":
     unittest.main()

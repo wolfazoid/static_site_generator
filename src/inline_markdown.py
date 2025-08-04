@@ -1,6 +1,15 @@
 from textnode import TextType, TextNode
 import re
 
+def text_to_textnodes(text):
+    nodes_list = [TextNode(text, TextType.TEXT)]
+    nodes_list = split_nodes_delimiter(nodes_list,'**',TextType.BOLD)
+    nodes_list = split_nodes_delimiter(nodes_list,'_',TextType.ITALIC)
+    nodes_list = split_nodes_delimiter(nodes_list,'`',TextType.CODE)
+    nodes_list = split_nodes_image(nodes_list)
+    nodes_list = split_nodes_link(nodes_list)
+    return nodes_list
+
 def extract_markdown_images(text):
     matches = re.findall(r"!\[([^\[\]]*)\]\(([^\(\)]*)\)", text)
     return matches
@@ -89,11 +98,3 @@ def split_nodes_link(old_nodes):
 
     return nodes_list
 
-def text_to_textnodes(text):
-    initial_node = [TextNode(text, TextType.TEXT)]
-    nodes_list = split_nodes_delimiter(initial_node,'**',TextType.BOLD)
-    nodes_list = split_nodes_delimiter(nodes_list,'_',TextType.ITALIC)
-    nodes_list = split_nodes_delimiter(nodes_list,'`',TextType.CODE)
-    nodes_list = split_nodes_image(nodes_list)
-    nodes_list = split_nodes_link(nodes_list)
-    return nodes_list
