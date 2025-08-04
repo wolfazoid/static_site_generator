@@ -62,7 +62,11 @@ def split_nodes_image(old_nodes):
                 raise ValueError("Invalid markdown: missing closing delimiter in image markdown")
             if sections[0] != "":
                 nodes_list.append(TextNode(sections[0], TextType.TEXT))
-            nodes_list.append(TextNode(image_alt, TextType.IMAGE, image_link))
+            nodes_list.append(
+                TextNode(
+                    image_alt, 
+                    TextType.IMAGE, 
+                    image_link))
             original_text = sections[1]
         if original_text != "":
             nodes_list.append(TextNode(original_text, TextType.TEXT))

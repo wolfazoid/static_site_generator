@@ -1,6 +1,6 @@
 from enum import Enum
 from htmlnode import HTMLNode, LeafNode, ParentNode
-from textnode import text_node_to_html_node
+from textnode import TextNode, TextType, text_node_to_html_node
 from inline_markdown import text_to_textnodes
 
 class BlockType(Enum):
@@ -26,16 +26,20 @@ def markdown_to_html_node(markdown):
         if block_type == BlockType.QUOTE:
             html_nodes.append(quote_to_html(block))
         if block_type == BlockType.CODE:
-            pass
+            html_nodes.append(code_to_html(block))
         if block_type == BlockType.UNORDERED_LIST:
-            html_node = unordered_list_to_html(block)
-            # html_node = ParentNode(tag='ul', children=children)
-            html_nodes.append(html_node)
+            html_nodes.append(unordered_list_to_html(block))
         if block_type == BlockType.ORDERED_LIST:
-            html_node = ParentNode(tag='ol')
-        #based on block_type, create an HTMLNode with tag, children, props
+            html_nodes.append(ordered_list_to_html(block))
     parent_node.children = html_nodes
     return parent_node
+
+def code_to_html(block):
+    text = block.strip("'''")
+    code_text = TextNode(text, TextType.CODE)
+    code_html = text_node_to_html_node(code_text)
+    html_node = ParentNode('pre', children=code_html)
+    return html_node
 
 def text_to_children(text):
     children = []
@@ -71,6 +75,19 @@ def unordered_list_to_html(block):
         line_item_html = ParentNode('li', children=line_children)
         line_items.append(line_item_html)
     ul_node = ParentNode('ul', children=line_items)
+    return ul_node
+
+def ordered_list_to_html(block):
+    lines = block.split('\n')
+    line_items = []
+    count = 1
+    for line in lines:
+        cleaned_line = line.split(f'{count}. ',1)[1]
+        line_children = text_to_children(cleaned_line)
+        line_item_html = ParentNode('li', children=line_children)
+        line_items.append(line_item_html)
+        count += 1
+    ul_node = ParentNode('ol', children=line_items)
     return ul_node
 
 def quote_to_html(block):
@@ -120,27 +137,4 @@ def block_to_block_type(block):
             line_count += 1
         return BlockType.ORDERED_LIST
     return BlockType.PARAGRAPH
-
-
-## Functions I might use
-
-
-def block_type_to_tag(block_type):
-    # Set tag based on block type
-    pass
-
-def link_to_props(block):
-    # Convert link to props dictionary
-    # Return HTMLNode with props and tag
-    pass
-
-def image_to_props(block):
-    # convert image to props dictionary
-    # Return HTMLNode with props and tag
-    pass
-
-def block_to_html_node(block, block_type):
-    # Identify block type
-    # send appropriate tag to HTML Node based on block type
-    pass
 

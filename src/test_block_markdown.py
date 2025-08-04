@@ -244,17 +244,56 @@ This is a simple paragraph with **bold** and _italic_ text.
 
 This is a second paragraph to demonstrate line breaks.
 
-- This is an unordered list and should **break things**
-- This is a another list item
+- This is an unordered list and should **not ** break things
+- This is another list item
 
 Give me more space.
 
 > Words can be like X-rays, if you use them properly—they’ll go through anything. You read and you’re pierced.
 > Aldous Huxley, Brave New World
+
+Now let's try an ordered list. Before we get there [here's a link](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/ol)
+
+1. This is item 1
+2. This is item 2
+3. Three's a charm
+4. I'm kinda bored
 """
         html_node = markdown_to_html_node(markdown)
         print(f'\n\nHTML Unit Test. \n\nhtml_node value:\n\n{html_node}\n')
         print(f'\nto_html value:\n\n{html_node.to_html()}\n')
+
+    def test_paragraphs(self):
+        md = """
+This is **bolded** paragraph
+text in a p
+tag here
+
+This is another paragraph with _italic_ text and `code` here
+
+"""
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><p>This is <b>bolded</b> paragraph text in a p tag here</p><p>This is another paragraph with <i>italic</i> text and <code>code</code> here</p></div>",
+        )
+
+    def test_codeblock(self):
+        md = """
+```
+This is text that _should_ remain
+the **same** even with inline stuff
+```
+"""
+
+        node = markdown_to_html_node(md)
+        html = node.to_html()
+        self.assertEqual(
+            html,
+            "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>",
+        )
 
 if __name__ == "__main__":
     unittest.main()
