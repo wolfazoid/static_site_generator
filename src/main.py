@@ -1,8 +1,9 @@
 import os
 from shutil import rmtree
+import sys
 
 from copy_directories import copy_directories
-from generate_pages import generate_page
+from generate_pages import generate_pages_recursive
 # from textnode import TextNode, TextType
 # from htmlnode import HTMLNode
 # from inline_markdown import extract_markdown_images, extract_markdown_links, split_nodes_image, split_nodes_link
@@ -21,10 +22,10 @@ def main():
     copy_directories(dir_path_static, dir_path_public)
 
     print("Generating page...")
-    generate_page(
-        os.path.join(dir_path_content, "index.md"),
+    generate_pages_recursive(
+        dir_path_content,
         template_path,
-        os.path.join(dir_path_public, "index.html")
+        dir_path_public
     )
 
 if __name__ == "__main__":
