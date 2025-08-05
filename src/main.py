@@ -13,11 +13,10 @@ dir_path_public = './docs'
 dir_path_content = './content'
 template_path = './template.html'
 
-def main():
+def main(basepath="/"):
     if len(sys.argv) > 1:
         basepath = sys.argv[1]
-    else:
-        basepath="/"
+    print(f"basepath: {basepath}")
     print("Cleaning out destination")
     if os.path.exists(dir_path_public):
         rmtree(dir_path_public)
