@@ -1,9 +1,11 @@
 import os
 from shutil import copy, rmtree
 
-def copy_directories(source='static', destination='public'):
+def copy_directories(source, destination):
     if not os.path.exists(source):
         raise Exception('Source path does not exist, cannot copy files')
+    if not destination:
+        raise Exception("Destination not given, can't copy file contents")
     if not os.path.exists(destination):
         os.mkdir(destination)
 
