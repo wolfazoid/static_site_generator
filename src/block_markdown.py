@@ -96,11 +96,12 @@ def quote_to_html(block):
     lines = block.split('\n')
     line_items = []
     for line in lines:
-        cleaned_line = line.strip('> ')
-        line_children = text_to_children(cleaned_line)
-        line_item_html = ParentNode('p', children=line_children)
-        line_items.append(line_item_html)
-    quote_node = ParentNode('blockquote', children=line_items)
+        if not line.startswith(">"):
+            raise ValueError("invalid quote block")
+        line_items.append(line.lstrip(">").strip())
+    content = " ".join(line_items)
+    children = text_to_children(content)
+    quote_node = ParentNode('blockquote', children=children)
     return quote_node
 
 def markdown_to_blocks(markdown):

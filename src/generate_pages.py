@@ -13,15 +13,25 @@ def generate_page(from_path, template_path, dest_path):
     html_content = markdown_to_html_node(md).to_html()
     title = extract_title(md)
 
-    render_template = template.replace("{{ Title }}", title)
-    render_template = render_template.replace("{{ Content }}", html_content)
-    f.close()
+    template = template.replace("{{ Title }}", title)
+    template = template.replace("{{ Content }}", html_content)
 
-    if not os.path.exists(dest_path):
-        os.mkdir(dest_path)
-    html = open(f"{title}.html","w")
+    dest_dir_path = os.path.dirname(dest_path)
+    if dest_dir_path!= "":
+        os.makedirs(dest_dir_path, exist_ok = True)
+    with open(dest_path,"w") as html_file:
+        html_file.write(template) 
     
-
+    
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    for fpath in os.listdir(dir_path_content):
+        from_path = os.path.join(dir_path_content, fpath)
+        dest_path = os.path.join(dest_dir_path, fpath)
+        if dest_path.endswith('md'):
+            html_path = dest_path.rstrip('.md') + '.html'
+            generate_page(from_path, template_path, html_path)
+        else:
+            generate_pages_recursive(from_path, template_path, dest_path)
 
 def extract_title(markdown):
     if "# " not in markdown:

@@ -58,7 +58,6 @@ def text_node_to_html_node(text_node):
             props={"href": text_node.url}
             )
     elif text_node.text_type.value == 'image':
-        print(f"\n\n\nWe're in the leaf node part\n\n\n")
         return LeafNode(
             tag='img', 
             value="", 

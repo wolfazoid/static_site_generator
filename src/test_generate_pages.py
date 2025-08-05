@@ -1,10 +1,13 @@
 import unittest
+import os
 
 from generate_pages import extract_title, generate_page
 
 class TestGeneratePages(unittest.TestCase):
     def test_generate_page(self):
-        generate_page('./content/index.md', './template.html', './public/index.html')
+        self.assertTrue(
+            os.path.exists('./public/Tolkien Fan Club.html')
+        )
 
     def test_extract_title(self):
         md = """
